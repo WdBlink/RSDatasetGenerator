@@ -1,7 +1,7 @@
 # 遥感数据集生成器 (Remote Sensing Dataset Generator)
 
-[![CI/CD](https://github.com/your-username/RSDatasetGenerator/workflows/CI/badge.svg)](https://github.com/your-username/RSDatasetGenerator/actions)
-[![Docker](https://img.shields.io/docker/v/your-username/rsdatasetgenerator?label=docker)](https://hub.docker.com/r/your-username/rsdatasetgenerator)
+[![CI/CD](https://github.com/WdBlink/RSDatasetGenerator/workflows/CI/badge.svg)](https://github.com/WdBlink/RSDatasetGenerator/actions)
+[![Docker](https://img.shields.io/docker/v/wdblink/rsdatasetgenerator?label=docker)](https://hub.docker.com/r/wdblink/rsdatasetgenerator)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -13,7 +13,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/RSDatasetGenerator.git
+git clone https://github.com/WdBlink/RSDatasetGenerator.git
 cd RSDatasetGenerator
 
 # 使用Docker Compose启动
@@ -319,7 +319,7 @@ osm_id    | geometry
 ### 环境设置
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/RSDatasetGenerator.git
+git clone https://github.com/WdBlink/RSDatasetGenerator.git
 cd RSDatasetGenerator
 
 # 设置开发环境
