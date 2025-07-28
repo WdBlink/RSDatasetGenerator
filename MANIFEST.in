@@ -1,0 +1,83 @@
+# RSDatasetGenerator包清单文件
+# 指定在构建分发包时需要包含的文件
+
+# 包含文档文件
+include README.md
+include LICENSE
+include CHANGELOG.md
+include requirements.txt
+include config.yaml
+
+# 包含配置文件
+include src/config/*.yaml
+include src/config/*.yml
+include src/templates/*.json
+include src/templates/*.yaml
+
+# 包含示例文件
+recursive-include examples *.py
+recursive-include examples *.geojson
+recursive-include examples *.shp
+recursive-include examples *.yaml
+recursive-include examples *.md
+
+# 包含测试文件
+recursive-include tests *.py
+recursive-include tests *.yaml
+recursive-include tests *.json
+recursive-include tests *.geojson
+
+# 包含脚本文件
+include *.py
+include migrate_legacy.py
+include validate_architecture.py
+include benchmark.py
+
+# 包含数据文件
+recursive-include data *.geojson
+recursive-include data *.shp
+recursive-include data *.dbf
+recursive-include data *.shx
+recursive-include data *.prj
+
+# 包含文档源文件
+recursive-include docs *.md
+recursive-include docs *.rst
+recursive-include docs *.txt
+recursive-include docs Makefile
+recursive-include docs make.bat
+
+# 排除不需要的文件
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude *.egg-info
+global-exclude build
+global-exclude dist
+global-exclude .pytest_cache
+global-exclude .coverage
+global-exclude .tox
+global-exclude .venv
+global-exclude venv
+global-exclude env
+
+# 排除临时文件
+global-exclude *~
+global-exclude *.tmp
+global-exclude *.temp
+global-exclude *.log
+global-exclude *.cache
+
+# 排除IDE文件
+global-exclude .vscode
+global-exclude .idea
+global-exclude *.swp
+global-exclude *.swo
+
+# 排除系统文件
+global-exclude Thumbs.db
+global-exclude desktop.ini

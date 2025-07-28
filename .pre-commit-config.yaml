@@ -1,0 +1,164 @@
+# Pre-commit hooks配置文件
+# 在提交代码前自动运行代码质量检查工具
+
+repos:
+  # 基础代码检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        description: 移除行尾空白字符
+      - id: end-of-file-fixer
+        description: 确保文件以换行符结尾
+      - id: check-yaml
+        description: 检查YAML文件语法
+      - id: check-json
+        description: 检查JSON文件语法
+      - id: check-toml
+        description: 检查TOML文件语法
+      - id: check-xml
+        description: 检查XML文件语法
+      - id: check-merge-conflict
+        description: 检查合并冲突标记
+      - id: check-case-conflict
+        description: 检查文件名大小写冲突
+      - id: check-symlinks
+        description: 检查符号链接
+      - id: check-added-large-files
+        description: 检查大文件
+        args: ['--maxkb=1000']
+      - id: debug-statements
+        description: 检查调试语句
+      - id: requirements-txt-fixer
+        description: 修复requirements.txt格式
+
+  # Python代码格式化
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        description: 使用Black格式化Python代码
+        language_version: python3
+        args: [--line-length=88]
+
+  # 导入排序
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        description: 使用isort排序导入语句
+        args: [--profile=black, --line-length=88]
+
+  # 代码风格检查
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        description: 使用Flake8检查代码风格
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-import-order
+          - flake8-bugbear
+        args:
+          - --max-line-length=88
+          - --extend-ignore=E203,W503,E501
+          - --max-complexity=10
+
+  # 类型检查
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        description: 使用MyPy进行类型检查
+        additional_dependencies:
+          - types-requests
+          - types-PyYAML
+          - types-tabulate
+        args: [--ignore-missing-imports, --no-strict-optional]
+        exclude: ^(tests/|examples/|benchmark\.py|migrate_legacy\.py)
+
+  # 安全检查
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        description: 使用Bandit检查安全问题
+        args: [-r, src/]
+        exclude: ^tests/
+
+  # 文档字符串检查
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        description: 检查文档字符串格式
+        args:
+          - --convention=google
+          - --add-ignore=D100,D101,D102,D103,D104,D105,D107
+        exclude: ^(tests/|examples/|setup\.py)
+
+  # 复杂度检查
+  - repo: https://github.com/xenon-python/xenon
+    rev: v0.9.0
+    hooks:
+      - id: xenon
+        description: 检查代码复杂度
+        args: [--max-average=A, --max-modules=B, --max-absolute=B]
+        exclude: ^(tests/|examples/)
+
+  # YAML格式化
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.0
+    hooks:
+      - id: prettier
+        description: 格式化YAML、JSON、Markdown文件
+        types_or: [yaml, json, markdown]
+        exclude: ^(CHANGELOG\.md|README\.md)
+
+  # Shell脚本检查
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+        description: 检查Shell脚本
+        types: [shell]
+
+  # 提交信息检查
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.6.0
+    hooks:
+      - id: commitizen
+        description: 检查提交信息格式
+        stages: [commit-msg]
+
+  # 许可证检查
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: insert-license
+        description: 插入许可证头
+        files: \.py$
+        args:
+          - --license-filepath
+          - LICENSE_HEADER.txt
+          - --comment-style
+          - "#"
+        exclude: ^(tests/|examples/|setup\.py|__init__\.py)
+
+# 全局配置
+default_stages: [commit]
+fail_fast: false
+repos_update_schedule: weekly
+
+# CI配置
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

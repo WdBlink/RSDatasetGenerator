@@ -1,0 +1,198 @@
+# 遥感数据集生成器配置文件
+# Remote Sensing Dataset Generator Configuration
+
+# 下载配置
+download:
+  # 瓦片缩放级别 (1-20)
+  zoom_level: 18
+  
+  # 网格大小 (每个点周围的瓦片网格)
+  grid_size: 5
+  
+  # 最大并发下载数
+  max_concurrency: 10
+  
+  # 最大重试次数
+  max_retries: 3
+  
+  # 请求超时时间（秒）
+  request_timeout: 30
+  
+  # 是否启用瓦片缓存
+  enable_cache: true
+  
+  # 下载器类型: 'sync', 'async', 'auto'
+  downloader_type: 'auto'
+  
+  # 是否在图像上添加点标记
+  add_markers: false
+  
+  # 请求延迟范围（秒）
+  delay_range: [0.1, 0.5]
+  
+  # 批处理大小（异步下载时）
+  batch_size: 50
+
+# 路径配置
+paths:
+  # 输出目录（相对于当前工作目录）
+  output_dir: "output"
+  
+  # 缓存目录
+  cache_dir: "cache"
+  
+  # 日志目录
+  log_dir: "logs"
+  
+  # 临时文件目录
+  temp_dir: "temp"
+
+# 网络配置
+network:
+  # Google Maps瓦片服务基础URL
+  base_url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+  
+  # 请求超时时间（秒）
+  timeout: 30
+  
+  # 连接池大小
+  connection_pool_size: 100
+  
+  # 请求头
+  headers:
+    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    Accept: "image/webp,image/apng,image/*,*/*;q=0.8"
+    Accept-Language: "en-US,en;q=0.9"
+    Accept-Encoding: "gzip, deflate, br"
+    Connection: "keep-alive"
+    Upgrade-Insecure-Requests: "1"
+
+# 图像处理配置
+image:
+  # 输出图像格式
+  format: "PNG"
+  
+  # 图像质量（对JPEG有效）
+  quality: 95
+  
+  # 是否优化图像
+  optimize: true
+  
+  # 点标记配置
+  marker:
+    # 标记颜色 (RGB)
+    color: [255, 0, 0]
+    
+    # 标记大小（像素）
+    size: 5
+    
+    # 标记形状: 'circle', 'square', 'cross'
+    shape: 'circle'
+    
+    # 标记透明度 (0-255)
+    alpha: 255
+
+# 日志配置
+logging:
+  # 日志级别: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
+  
+  # 是否输出到控制台
+  console_output: true
+  
+  # 是否输出到文件
+  file_output: true
+  
+  # 日志文件名格式
+  filename_format: "rs_generator_{timestamp}.log"
+  
+  # 日志消息格式
+  message_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # 日志文件最大大小（MB）
+  max_file_size: 10
+  
+  # 保留的日志文件数量
+  backup_count: 5
+
+# 性能监控配置
+monitoring:
+  # 是否启用性能监控
+  enabled: true
+  
+  # 监控间隔（秒）
+  interval: 5
+  
+  # 是否记录系统资源使用情况
+  track_system_resources: true
+  
+  # 是否记录下载统计
+  track_download_stats: true
+
+# 输出配置
+output:
+  # 是否生成元数据文件
+  generate_metadata: true
+  
+  # 元数据格式: 'json', 'yaml', 'xml'
+  metadata_formats: ["json", "yaml"]
+  
+  # 是否生成CSV坐标映射文件
+  generate_csv: true
+  
+  # 是否生成处理报告
+  generate_report: true
+  
+  # 是否保存处理统计
+  save_statistics: true
+  
+  # 是否压缩输出文件
+  compress_output: false
+
+# 验证配置
+validation:
+  # 是否验证输入文件
+  validate_input: true
+  
+  # 是否验证下载的瓦片
+  validate_tiles: true
+  
+  # 是否验证生成的图像
+  validate_images: true
+  
+  # 最小图像尺寸（像素）
+  min_image_size: [100, 100]
+  
+  # 最大图像尺寸（像素）
+  max_image_size: [10000, 10000]
+
+# 错误处理配置
+error_handling:
+  # 是否在遇到错误时继续处理
+  continue_on_error: true
+  
+  # 最大错误数量（超过则停止处理）
+  max_errors: 100
+  
+  # 是否保存错误日志
+  save_error_log: true
+  
+  # 是否在错误时发送通知
+  notify_on_error: false
+
+# 缓存配置
+cache:
+  # 缓存策略: 'memory', 'disk', 'both'
+  strategy: 'disk'
+  
+  # 内存缓存大小（MB）
+  memory_size: 100
+  
+  # 磁盘缓存大小（MB）
+  disk_size: 1000
+  
+  # 缓存过期时间（小时）
+  expiry_hours: 24
+  
+  # 是否压缩缓存文件
+  compress: true
