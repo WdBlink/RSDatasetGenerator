@@ -162,7 +162,8 @@ class ShapefileLoader(BaseDataLoader):
             文件是否有效
         """
         try:
-            return validate_shapefile(file_path)
+            validate_shapefile(file_path)
+            return True
         except Exception as e:
             self.logger.error(f"验证Shapefile失败: {str(e)}")
             return False

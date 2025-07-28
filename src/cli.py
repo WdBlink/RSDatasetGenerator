@@ -54,29 +54,27 @@ def validate_arguments(args: argparse.Namespace) -> bool:
     errors = []
     
     # 验证输入文件
-    if not os.path.exists(args.input_file):
-        errors.append(f"输入文件不存在: {args.input_file}")
+    if not os.path.exists(args.input):
+        errors.append(f"输入文件不存在: {args.input}")
     
     # 验证配置文件（如果提供）
     if args.config and not os.path.exists(args.config):
         errors.append(f"配置文件不存在: {args.config}")
     
     # 验证缩放级别
-    if not (1 <= args.zoom_level <= 20):
-        errors.append(f"缩放级别必须在1-20之间，当前值: {args.zoom_level}")
+    zoom = getattr(args, 'zoom', 18)
+    if not (1 <= zoom <= 20):
+        errors.append(f"缩放级别必须在1-20之间，当前值: {zoom}")
     
     # 验证网格大小
-    if not (1 <= args.grid_size <= 20):
-        errors.append(f"网格大小必须在1-20之间，当前值: {args.grid_size}")
+    grid_size = getattr(args, 'grid_size', 9)
+    if grid_size not in [3, 5, 7, 9, 11]:
+        errors.append(f"网格大小必须是3,5,7,9,11中的一个，当前值: {grid_size}")
     
     # 验证并发数
-    if not (1 <= args.max_concurrency <= 100):
-        errors.append(f"最大并发数必须在1-100之间，当前值: {args.max_concurrency}")
-    
-    # 验证下载器类型
-    valid_downloaders = ['sync', 'async', 'auto']
-    if args.downloader_type not in valid_downloaders:
-        errors.append(f"无效的下载器类型: {args.downloader_type}，有效值: {valid_downloaders}")
+    max_concurrency = getattr(args, 'max_concurrency', 8)
+    if not (1 <= max_concurrency <= 100):
+        errors.append(f"最大并发数必须在1-100之间，当前值: {max_concurrency}")
     
     if errors:
         print("参数验证失败:")
@@ -97,15 +95,10 @@ def create_config_from_args(args: argparse.Namespace) -> Dict[str, Any]:
         配置字典
     """
     config_dict = {
-        'zoom_level': args.zoom_level,
-        'grid_size': args.grid_size,
-        'max_concurrency': args.max_concurrency,
-        'max_retries': args.max_retries,
-        'request_timeout': args.request_timeout,
-        'enable_cache': args.enable_cache,
-        'downloader_type': args.downloader_type,
-        'add_markers': args.add_markers,
-        'delay_range': [args.min_delay, args.max_delay]
+        'zoom': getattr(args, 'zoom', 18),
+        'grid_size': getattr(args, 'grid_size', 9),
+        'max_concurrency': getattr(args, 'max_concurrency', 8),
+        'request_timeout': getattr(args, 'timeout', 30.0)
     }
     
     return config_dict
@@ -132,24 +125,21 @@ def print_processing_info(args: argparse.Namespace, generator: RSDatasetGenerato
         generator: 数据集生成器实例
     """
     print("\n处理配置:")
-    print(f"  输入文件: {args.input_file}")
-    print(f"  输出目录: {args.output_dir or '自动生成'}")
-    print(f"  缩放级别: {args.zoom_level}")
-    print(f"  网格大小: {args.grid_size}x{args.grid_size}")
-    print(f"  下载器类型: {args.downloader_type}")
-    print(f"  最大并发数: {args.max_concurrency}")
-    print(f"  启用缓存: {'是' if args.enable_cache else '否'}")
-    print(f"  添加标记: {'是' if args.add_markers else '否'}")
+    print(f"  输入文件: {getattr(args, 'input', 'N/A')}")
+    print(f"  输出目录: {getattr(args, 'output_dir', '自动生成')}")
+    print(f"  缩放级别: {getattr(args, 'zoom', 18)}")
+    print(f"  网格大小: {getattr(args, 'grid_size', 9)}x{getattr(args, 'grid_size', 9)}")
+    print(f"  最大并发数: {getattr(args, 'max_concurrency', 8)}")
     
     # 估算处理时间
     if not args.no_estimate:
         print("\n正在估算处理时间...")
         try:
             estimate = generator.estimate_processing_time(
-                args.input_file,
-                zoom_level=args.zoom_level,
-                grid_size=args.grid_size,
-                max_concurrency=args.max_concurrency
+                getattr(args, 'input', ''),
+                zoom_level=getattr(args, 'zoom', 18),
+                grid_size=getattr(args, 'grid_size', 9),
+                max_concurrency=getattr(args, 'max_concurrency', 8)
             )
             
             if estimate:
@@ -364,7 +354,7 @@ def main():
             print_processing_info(args, generator)
         
         # 确认开始处理
-        if not args.quiet and not args.yes:
+        if not args.quiet:
             response = input("确认开始处理? (Y/n): ").strip().lower()
             if response in ['n', 'no', '否']:
                 print("用户取消操作。")
@@ -373,8 +363,8 @@ def main():
         # 开始处理
         with generator:
             result = generator.generate_dataset(
-                args.input_file,
-                args.output_dir
+                args.input,
+                getattr(args, 'output_dir', None)
             )
         
         # 显示结果

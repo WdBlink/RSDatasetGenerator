@@ -11,6 +11,11 @@ from typing import Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from pathlib import Path
 
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 
 @dataclass
 class DownloadConfig:
@@ -86,23 +91,42 @@ class Config:
             self.download = DownloadConfig()
             self.paths = PathConfig()
             self.network = NetworkConfig()
+            
+            # 初始化日志器
+            from .utils import Logger
+            self.logger = Logger(
+                name='RSDatasetGenerator',
+                level='INFO',
+                log_dir=self.paths.log_dir
+            )
+            
             self._initialized = True
     
     def load_from_file(self, config_file: str) -> None:
         """从配置文件加载配置
         
         Args:
-            config_file: 配置文件路径（支持JSON格式）
+            config_file: 配置文件路径（支持JSON和YAML格式）
             
         Raises:
             FileNotFoundError: 配置文件不存在
             json.JSONDecodeError: 配置文件格式错误
+            yaml.YAMLError: YAML配置文件格式错误
         """
         if not os.path.exists(config_file):
             raise FileNotFoundError(f"配置文件不存在: {config_file}")
         
+        # 根据文件扩展名确定格式
+        file_ext = os.path.splitext(config_file)[1].lower()
+        
         with open(config_file, 'r', encoding='utf-8') as f:
-            config_data = json.load(f)
+            if file_ext in ['.yaml', '.yml']:
+                if yaml is None:
+                    raise ImportError("需要安装PyYAML库来支持YAML格式配置文件")
+                config_data = yaml.safe_load(f)
+            else:
+                # 默认使用JSON格式
+                config_data = json.load(f)
         
         # 更新下载配置
         if 'download' in config_data:
@@ -225,6 +249,38 @@ class Config:
         """
         with open(config_file, 'w', encoding='utf-8') as f:
             json.dump(self.to_dict(), f, indent=2, ensure_ascii=False)
+    
+    def update_from_dict(self, config_dict: Dict[str, Any]) -> None:
+        """从字典更新配置
+        
+        Args:
+            config_dict: 配置字典
+        """
+        # 更新下载配置
+        if 'download' in config_dict:
+            download_data = config_dict['download']
+            for key, value in download_data.items():
+                if hasattr(self.download, key):
+                    setattr(self.download, key, value)
+        
+        # 更新路径配置
+        if 'paths' in config_dict:
+            paths_data = config_dict['paths']
+            for key, value in paths_data.items():
+                if hasattr(self.paths, key):
+                    setattr(self.paths, key, value)
+        
+        # 更新网络配置
+        if 'network' in config_dict:
+            network_data = config_dict['network']
+            for key, value in network_data.items():
+                if hasattr(self.network, key):
+                    setattr(self.network, key, value)
+        
+        # 处理顶级配置项
+        for key, value in config_dict.items():
+            if key not in ['download', 'paths', 'network'] and hasattr(self, key):
+                setattr(self, key, value)
     
     @classmethod
     def reset(cls) -> None:

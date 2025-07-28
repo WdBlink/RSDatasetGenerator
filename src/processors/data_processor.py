@@ -219,7 +219,7 @@ class DataProcessor:
             # 5. 处理图像
             image, metadata = self.image_processor.process_point_image(
                 point, download_results, 
-                self.config.download.zoom_level,
+                self.config.download.zoom,
                 self.config.download.grid_size
             )
             
@@ -251,9 +251,9 @@ class DataProcessor:
             瓦片信息列表
         """
         # 使用下载器的瓦片计算方法
-        return self.downloader.calculate_tiles_around_point(
+        return self.downloader.calculate_tiles_for_point(
             point.longitude, point.latitude,
-            self.config.download.zoom_level,
+            self.config.download.zoom,
             self.config.download.grid_size
         )
     
@@ -321,7 +321,7 @@ class DataProcessor:
         config_snapshot = {
             'input_file': getattr(self.config.paths, 'input_file', ''),
             'output_dir': self.config.paths.output_dir,
-            'zoom_level': self.config.download.zoom_level,
+            'zoom_level': self.config.download.zoom,
             'grid_size': self.config.download.grid_size,
             'max_concurrency': self.config.download.max_concurrency,
             'downloader_type': getattr(self.config.download, 'downloader_type', 'auto'),

@@ -49,10 +49,7 @@ class RSDatasetGenerator:
         if kwargs:
             self.config.update_from_dict(kwargs)
         
-        # 验证配置
-        self.config.validate()
-        
-        # 初始化日志
+        # 初始化日志（在验证之前，以便记录错误）
         self.logger = self.config.logger
         
         # 初始化数据处理器
@@ -90,13 +87,16 @@ class RSDatasetGenerator:
             # 2. 更新配置
             self._update_config_for_processing(input_file, output_dir, processing_options)
             
-            # 3. 验证下载器配置
+            # 3. 验证配置
+            self.config.validate()
+            
+            # 4. 验证下载器配置
             self._validate_downloader_config()
             
-            # 4. 初始化数据处理器
+            # 5. 初始化数据处理器
             self.data_processor = DataProcessor(self.config)
             
-            # 5. 估算处理时间
+            # 6. 估算处理时间
             time_estimate = self.data_processor.estimate_processing_time(input_file)
             if time_estimate:
                 self.logger.info(
@@ -105,11 +105,11 @@ class RSDatasetGenerator:
                     f"总瓦片数: {time_estimate.get('total_tiles', 0)}"
                 )
             
-            # 6. 开始处理
+            # 7. 开始处理
             self.logger.info("开始生成遥感数据集...")
             result = self.data_processor.process_dataset(input_file)
             
-            # 7. 记录处理结果
+            # 8. 记录处理结果
             self._log_processing_result(result)
             
             return result
@@ -228,7 +228,7 @@ class RSDatasetGenerator:
             processing_options: 处理选项
         """
         # 设置输入文件
-        self.config.paths.input_file = input_file
+        self.config.paths.input_shapefile = input_file
         
         # 设置输出目录
         if output_dir:

@@ -51,19 +51,36 @@ class Logger:
     提供统一的日志管理功能，支持文件和控制台输出。
     """
     
-    def __init__(self, name: str = "RSDatasetGenerator", log_dir: str = "./logs"):
+    def __init__(self, name: str = "RSDatasetGenerator", level: str = "INFO", 
+                 log_file: str = None, console_output: bool = True, 
+                 file_output: bool = True, log_dir: str = "./logs"):
         """初始化日志管理器
         
         Args:
             name: 日志器名称
-            log_dir: 日志文件存储目录
+            level: 日志级别 (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+            log_file: 指定的日志文件路径
+            console_output: 是否输出到控制台
+            file_output: 是否输出到文件
+            log_dir: 日志文件存储目录（当log_file未指定时使用）
         """
         self.name = name
-        self.log_dir = Path(log_dir)
-        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self.level = getattr(logging, level.upper(), logging.INFO)
+        self.console_output = console_output
+        self.file_output = file_output
+        
+        # 设置日志文件路径
+        if log_file:
+            self.log_file = Path(log_file)
+            # 确保日志文件目录存在
+            self.log_file.parent.mkdir(parents=True, exist_ok=True)
+        else:
+            self.log_dir = Path(log_dir)
+            self.log_dir.mkdir(parents=True, exist_ok=True)
+            self.log_file = self.log_dir / f"{self.name}_{datetime.now().strftime('%Y%m%d')}.log"
         
         self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(self.level)
         
         # 避免重复添加处理器
         if not self.logger.handlers:
@@ -71,26 +88,25 @@ class Logger:
     
     def _setup_handlers(self) -> None:
         """设置日志处理器"""
-        # 文件处理器
-        log_file = self.log_dir / f"{self.name}_{datetime.now().strftime('%Y%m%d')}.log"
-        file_handler = logging.FileHandler(log_file, encoding='utf-8')
-        file_handler.setLevel(logging.DEBUG)
-        
-        # 控制台处理器
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(logging.INFO)
-        
         # 格式化器
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
+        # 文件处理器
+        if self.file_output:
+            file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(formatter)
+            self.logger.addHandler(file_handler)
         
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(console_handler)
+        # 控制台处理器
+        if self.console_output:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setLevel(self.level)
+            console_handler.setFormatter(formatter)
+            self.logger.addHandler(console_handler)
     
     def debug(self, message: str, *args, **kwargs) -> None:
         """记录调试信息"""
@@ -269,23 +285,54 @@ class ProgressReporter:
     提供任务进度的实时报告功能。
     """
     
-    def __init__(self, total_tasks: int, report_interval: float = 5.0):
+    def __init__(self, logger, report_interval: float = 5.0):
         """初始化进度报告器
         
         Args:
-            total_tasks: 总任务数
+            logger: 日志器实例
             report_interval: 报告间隔（秒）
         """
-        self.total_tasks = total_tasks
-        self.completed_tasks = 0
+        self.logger = logger
         self.report_interval = report_interval
+        self.reset()
+    
+    def reset(self):
+        """重置进度报告器"""
+        self.total_tasks = 0
+        self.completed_tasks = 0
         self.last_report_time = time.time()
         self.start_time = time.time()
+        self.current_task_name = ""
+    
+    def start_task(self, task_name: str, total_tasks: int) -> None:
+        """开始新任务
         
-        self.logger = Logger("ProgressReporter")
+        Args:
+            task_name: 任务名称
+            total_tasks: 总任务数
+        """
+        self.current_task_name = task_name
+        self.total_tasks = total_tasks
+        self.completed_tasks = 0
+        self.start_time = time.time()
+        self.last_report_time = self.start_time
+        self.logger.info(f"开始{task_name}: 总计 {total_tasks} 个任务")
+    
+    def update_progress(self, completed: int) -> None:
+        """更新进度
+        
+        Args:
+            completed: 已完成的任务数
+        """
+        self.completed_tasks = completed
+        
+        current_time = time.time()
+        if current_time - self.last_report_time >= self.report_interval:
+            self._report_progress()
+            self.last_report_time = current_time
     
     def update(self, increment: int = 1) -> None:
-        """更新进度
+        """增量更新进度
         
         Args:
             increment: 增加的任务数
@@ -315,16 +362,20 @@ class ProgressReporter:
             f"速度: {speed:.2f} 任务/秒{eta_str}"
         )
     
-    def finish(self) -> None:
-        """完成进度报告"""
+    def finish_task(self) -> None:
+        """完成当前任务"""
         elapsed = time.time() - self.start_time
         avg_speed = self.completed_tasks / max(elapsed, 1)
         
         self.logger.info(
-            f"任务完成! 总计: {self.completed_tasks}/{self.total_tasks}, "
+            f"{self.current_task_name}完成! 总计: {self.completed_tasks}/{self.total_tasks}, "
             f"耗时: {elapsed:.1f}秒, "
             f"平均速度: {avg_speed:.2f} 任务/秒"
         )
+    
+    def finish(self) -> None:
+        """完成进度报告（向后兼容）"""
+        self.finish_task()
 
 
 def validate_shapefile(shapefile_path: str) -> None:
