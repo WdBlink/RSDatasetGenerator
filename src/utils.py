@@ -40,6 +40,11 @@ class ValidationError(RSDatasetGeneratorError):
     pass
 
 
+class DataProcessingError(RSDatasetGeneratorError):
+    """数据处理错误异常"""
+    pass
+
+
 class Logger:
     """日志管理器
     

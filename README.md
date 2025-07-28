@@ -113,7 +113,7 @@ pip install -r requirements-dev.txt
 # 基本配置示例
 download:
   zoom_level: 18
-  grid_size: 5
+  grid_size: 9
   max_concurrent: 8
   
 paths:

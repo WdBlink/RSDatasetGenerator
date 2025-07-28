@@ -247,7 +247,6 @@ def create_argument_parser() -> argparse.ArgumentParser:
     # 必需参数
     parser.add_argument(
         '--input', '-i',
-        required=True,
         help='输入Shapefile路径'
     )
     

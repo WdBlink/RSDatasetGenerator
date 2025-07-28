@@ -9,7 +9,7 @@ __author__ = "RSDatasetGenerator Team"
 __email__ = "contact@rsdatasetgenerator.com"
 
 from .config import Config
-from .core import RSDatasetGenerator
+from .rs_dataset_generator import RSDatasetGenerator
 from .downloaders import DownloaderFactory
 from .processors import DataProcessor
 from .utils import Logger

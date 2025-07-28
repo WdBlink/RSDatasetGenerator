@@ -7,7 +7,7 @@ download:
   zoom_level: 18
   
   # 网格大小 (每个点周围的瓦片网格)
-  grid_size: 5
+  grid_size: 9
   
   # 最大并发下载数
   max_concurrency: 10

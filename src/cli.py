@@ -294,12 +294,12 @@ def main():
         
         # 添加CLI特有的参数
         parser.add_argument(
-            '--interactive', '-i',
+            '--interactive',
             action='store_true',
             help='启用交互模式'
         )
         parser.add_argument(
-            '--verbose', '-v',
+            '--cli-verbose',
             action='store_true',
             help='启用详细日志输出'
         )
@@ -335,12 +335,12 @@ def main():
             return
         
         # 检查必需参数
-        if not hasattr(args, 'input_file') or not args.input_file:
+        if not hasattr(args, 'input') or not args.input:
             parser.error("必须提供输入文件路径，或使用 --interactive 进入交互模式")
         
         # 设置日志
         if not args.quiet:
-            logger = setup_logging(args.verbose, args.log_file)
+            logger = setup_logging(args.cli_verbose, args.log_file)
         
         # 显示横幅
         if not args.no_banner and not args.quiet:
@@ -403,7 +403,7 @@ def main():
         sys.exit(1)
     except Exception as e:
         print(f"未知错误: {str(e)}")
-        if '--verbose' in sys.argv or '-v' in sys.argv:
+        if '--cli-verbose' in sys.argv:
             import traceback
             traceback.print_exc()
         sys.exit(1)

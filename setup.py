@@ -96,11 +96,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/your-username/RSDatasetGenerator",
-    project_urls={
-        "Bug Reports": "https://github.com/your-username/RSDatasetGenerator/issues",
-        "Source": "https://github.com/your-username/RSDatasetGenerator",
-        "Documentation": "https://rsdatasetgenerator.readthedocs.io/",
-    },
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[

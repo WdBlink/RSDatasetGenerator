@@ -1,0 +1,61 @@
+# RSDatasetGenerator Conda环境配置文件
+# 遥感数据集生成器的Conda环境依赖
+
+name: rs-dataset-generator
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # Python版本
+  - python>=3.8,<3.13
+  
+  # 地理空间数据处理核心库
+  - geopandas>=0.14.0
+  - shapely>=2.0.0
+  - fiona>=1.9.0
+  - pyproj>=3.6.0
+  - gdal>=3.7.0
+  - proj>=9.2.0
+  - geos>=3.11.0
+  
+  # 图像处理
+  - pillow>=10.0.0
+  - numpy>=1.24.0
+  
+  # 网络请求和异步处理
+  - requests>=2.31.0
+  - aiohttp>=3.9.0
+  - aiofiles>=23.2.0
+  
+  # 数据处理和配置
+  - pyyaml>=6.0.1
+  - pandas>=2.0.0
+  
+  # 用户界面和进度显示
+  - tqdm>=4.66.0
+  - click>=8.1.0
+  - colorama>=0.4.6
+  - tabulate>=0.9.0
+  
+  # 系统监控
+  - psutil>=5.9.0
+  
+  # 开发工具（可选）
+  - pytest>=7.4.0
+  - pytest-asyncio>=0.21.0
+  - pytest-cov>=4.1.0
+  - black>=23.7.0
+  - flake8>=6.0.0
+  - mypy>=1.5.0
+  - isort>=5.12.0
+  
+  # Jupyter支持（可选）
+  - jupyter>=1.0.0
+  - ipykernel>=6.25.0
+  - matplotlib>=3.7.0
+  
+  # pip依赖（conda中不可用的包）
+  - pip
+  - pip:
+    # 如果有conda中不可用的特定包，在这里添加
+    # - some-pip-only-package
